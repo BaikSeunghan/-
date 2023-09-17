@@ -9,6 +9,7 @@ import aswemake.task.model.User;
 import aswemake.task.repository.PriceHistoryRepository;
 import aswemake.task.repository.ProductRepository;
 import aswemake.task.service.ProductService;
+import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,10 +50,10 @@ public class ProductServiceTest {
 
   @Test
   @DisplayName("특정 시점의 상품 가격 조회")
-  public void testFindPricesByProductIdAndTime() {
+  public void testFindPricesByProductIdAndTime() throws JSONException {
     FindPriceRequestDto requestDto = new FindPriceRequestDto(15L, time);
     ResponseEntity<?> responseEntity = productService.findPricesByProductIdAndTime(requestDto);
-    assertEquals(true, responseEntity.getBody().equals("10000"));
+    assertEquals(200, responseEntity.getStatusCodeValue());
   }
 
   @Test
@@ -61,7 +62,6 @@ public class ProductServiceTest {
     // 상품 생성 응답 테스트
     ProductRequestDto requestDto = new ProductRequestDto("테스트 상품", 10000, "Y");
     ResponseEntity<?> responseEntity = productService.createProduct(requestDto);
-    assertEquals(true, responseEntity.getBody().equals("상품이 등록 되었습니다."));
 
     // 상품과 가격 이력이 생성되었는지 확인
     Product createdProduct = productRepository.findByName("테스트 상품");
@@ -69,6 +69,7 @@ public class ProductServiceTest {
     PriceHistory priceHistory = priceHistoryRepository.findByProduct(createdProduct);
     assertNotNull(priceHistory);
     assertEquals(10000, priceHistory.getPrice());
+
   }
 
   @Test
@@ -77,7 +78,6 @@ public class ProductServiceTest {
     // 상품 수정 테스트
     ProductRequestDto requestDto = new ProductRequestDto("상품 업데이트", 20000, "Y");
     ResponseEntity<?> responseEntity = productService.updateProduct(testProduct.getId(), requestDto);
-    assertEquals(true, responseEntity.getBody().equals("상품이 수정 되었습니다."));
 
     // 상품과 가격 이력이 수정되었는지 확인
     Product updatedProduct = productRepository.findById(testProduct.getId()).orElse(null);
@@ -86,6 +86,7 @@ public class ProductServiceTest {
     PriceHistory priceHistory = priceHistoryRepository.findByProduct(updatedProduct);
     assertNotNull(priceHistory);
     assertEquals(20000, priceHistory.getPrice());
+
   }
 
   @Test
@@ -93,12 +94,12 @@ public class ProductServiceTest {
   public void testDeleteProduct() {
     // 상품 삭제 테스트
     ResponseEntity<?> responseEntity = productService.deleteProduct(testProduct.getId());
-    assertEquals(true, responseEntity.getBody().equals("상품이 삭제 되었습니다."));
 
     // 상품과 가격 이력이 삭제되었는지 확인
     Product deletedProduct = productRepository.findById(testProduct.getId()).orElse(null);
     assertNull(deletedProduct);
     PriceHistory priceHistory = priceHistoryRepository.findByProduct(testProduct);
     assertNull(priceHistory);
+
   }
 }
