@@ -1,50 +1,38 @@
 package aswemake.task.controller;
 
-import aswemake.task.dto.SignUpRequestDto;
+import aswemake.task.dto.LoginRequestDto;;
+import aswemake.task.dto.ResponseDto;
 import aswemake.task.model.User;
 import aswemake.task.repository.UserRepository;
+import aswemake.task.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @Slf4j
 public class LoginController {
-
   private final UserRepository userRepository;
-  @GetMapping("/accessDenied")
-  public String accessDenied() {
-    return "accessDenied";
-  }
+  private final UserService userService;
 
-  @GetMapping("/login")
-  public String loginForm() {
-    return "login/loginForm";
-  }
+  @PostMapping("/login")
+  public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDto requestDto) {
 
-  @PostMapping("/loginProcess")
-  public String login(SignUpRequestDto dto, Model model) {
+    userService.loadUserByUsername(requestDto.getName());
 
-    Optional<User> findUser = userRepository.findByName(dto.getName());
-    log.info("findUser:" + findUser);
-
-    if (findUser.isPresent()) {
-      return "hello";
+    if (userRepository.findByName(requestDto.getName()).isPresent()) {
+      return ResponseEntity.ok(new ResponseDto(true, "로그인 성공"));
+    } else {
+      throw new IllegalArgumentException("로그인 실패");
     }
-    model.addAttribute("loginError", "존재하지않는 유저입니다.");
-    return "login/loginForm";
-  }
-
-  @GetMapping(value = "/login/error")
-  public String loginError(Model model) {
-    model.addAttribute("loginError", "로그인 중 에러 발생.");
-    return "login/loginForm";
   }
 
 }

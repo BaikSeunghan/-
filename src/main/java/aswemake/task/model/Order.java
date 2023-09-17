@@ -26,6 +26,6 @@ public class Order extends Timestamped {
 
   @JsonIgnore
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-  private List<OrderProduct> orderProducts = new ArrayList<>();
+  private List<OrderProduct> orderProductList = new ArrayList<>();
 
 }

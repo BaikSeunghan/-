@@ -3,37 +3,28 @@ package aswemake.task.controller;
 import aswemake.task.dto.SignUpRequestDto;
 import aswemake.task.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
 
 @Controller
 @RequiredArgsConstructor
 public class RegisterController {
+  private final UserService userService;
+  private final PasswordEncoder passwordEncoder;
 
-    private final UserService userService;
+  /**
+   * 회원 가입
+   * @param requestDto
+   * @return
+   */
+  @PostMapping("/register")
+  public ResponseEntity<?> register(@RequestBody @Valid SignUpRequestDto requestDto) {
 
-    @GetMapping("/register")
-    public String registerForm(Model model) {
-        model.addAttribute("signUpRequestDto", new SignUpRequestDto());
-        return "login/registerform";
-    }
-    @PostMapping("/registerProcess")
-    public String register(@Valid SignUpRequestDto dto, BindingResult result, Model model) {
-        if (result.hasErrors()) {
-            return "login/registerform";
-        }
-        try {
-            userService.createUser(dto);
-        } catch (IllegalStateException e) {
-            e.getStackTrace();
-            model.addAttribute("joinError", e.getMessage());
-            return "login/registerform";
-        }
-        return "login/loginForm";
-    }
+    return userService.createUser(requestDto, passwordEncoder);
+  }
 }
