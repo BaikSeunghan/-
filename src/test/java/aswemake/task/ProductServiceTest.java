@@ -62,6 +62,7 @@ public class ProductServiceTest {
     // 상품 생성 응답 테스트
     ProductRequestDto requestDto = new ProductRequestDto("테스트 상품", 10000, "Y");
     ResponseEntity<?> responseEntity = productService.createProduct(requestDto);
+    assertEquals(200, responseEntity.getStatusCodeValue());
 
     // 상품과 가격 이력이 생성되었는지 확인
     Product createdProduct = productRepository.findByName("테스트 상품");
@@ -78,6 +79,7 @@ public class ProductServiceTest {
     // 상품 수정 테스트
     ProductRequestDto requestDto = new ProductRequestDto("상품 업데이트", 20000, "Y");
     ResponseEntity<?> responseEntity = productService.updateProduct(testProduct.getId(), requestDto);
+    assertEquals(200, responseEntity.getStatusCodeValue());
 
     // 상품과 가격 이력이 수정되었는지 확인
     Product updatedProduct = productRepository.findById(testProduct.getId()).orElse(null);
@@ -94,6 +96,7 @@ public class ProductServiceTest {
   public void testDeleteProduct() {
     // 상품 삭제 테스트
     ResponseEntity<?> responseEntity = productService.deleteProduct(testProduct.getId());
+    assertEquals(200, responseEntity.getStatusCodeValue());
 
     // 상품과 가격 이력이 삭제되었는지 확인
     Product deletedProduct = productRepository.findById(testProduct.getId()).orElse(null);
